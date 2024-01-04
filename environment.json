@@ -1,0 +1,33 @@
+{
+	"id": "7b9800c8-4014-4570-a2fc-76986f5b784e",
+	"name": "QAuto Dev Check",
+	"values": [
+		{
+			"key": "API_URL",
+			"value": "https://qauto2.forstudy.space/api",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "emailgen",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "pass",
+			"value": "Qwerty12345",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "new_pass",
+			"value": "Ytrewq54321",
+			"type": "default",
+			"enabled": true
+		}
+	],
+	"_postman_variable_scope": "environment",
+	"_postman_exported_at": "2023-12-11T16:42:37.656Z",
+	"_postman_exported_using": "Postman/10.20.10"
+}

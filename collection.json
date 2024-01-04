@@ -1,0 +1,743 @@
+{
+	"info": {
+		"_postman_id": "422b7365-b2ab-47f6-8f34-4674c489c7b4",
+		"name": "QAuto Makarov",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19364559"
+	},
+	"item": [
+		{
+			"name": "SignUp",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful POST request\", function () {\r",
+							"    pm.expect(pm.response.code).to.be.oneOf([201, 202]);\r",
+							"});\r",
+							"\r",
+							"const schema = {\r",
+							"  \"type\": \"object\",\r",
+							"  \"properties\": {\r",
+							"    \"status\": {\r",
+							"      \"type\": \"string\"\r",
+							"    },\r",
+							"    \"data\": {\r",
+							"      \"type\": \"object\",\r",
+							"      \"properties\": {\r",
+							"        \"userId\": {\r",
+							"          \"type\": \"integer\"\r",
+							"        },\r",
+							"        \"photoFilename\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"distanceUnits\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"currency\": {\r",
+							"          \"type\": \"string\"\r",
+							"        }\r",
+							"      },\r",
+							"      \"required\": [\r",
+							"        \"userId\",\r",
+							"        \"photoFilename\",\r",
+							"        \"distanceUnits\",\r",
+							"        \"currency\"\r",
+							"      ]\r",
+							"    }\r",
+							"  },\r",
+							"  \"required\": [\r",
+							"    \"status\",\r",
+							"    \"data\"\r",
+							"  ]\r",
+							"}\r",
+							"\r",
+							"pm.test(\"Schema is valid\", function(){\r",
+							"    pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true;\r",
+							"})\r",
+							"const responseBodySign = pm.response.json();\r",
+							"pm.collectionVariables.set(\"UserID\", responseBodySign.data.userId);\r",
+							"pm.collectionVariables.set(\"photoFilename\", responseBodySign.data.photoFilename);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var emailgen = pm.variables.replaceIn('{{$randomEmail}}');\r",
+							"pm.environment.set(\"emailgen\", emailgen);\r",
+							"var name = pm.collectionVariables.get(\"name\");\r",
+							"var last_name = pm.collectionVariables.get(\"last_name\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"{{name}}\",\r\n  \"lastName\": \"{{last_name}}\",\r\n  \"email\": \"{{emailgen}}\",\r\n  \"password\": \"{{pass}}\",\r\n  \"repeatPassword\": \"{{pass}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_URL}}/auth/signup",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"auth",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SignIn",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"{{emailgen}}\",\r\n    \"password\": \"{{pass}}\",\r\n    \"remember\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_URL}}/auth/signin",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"auth",
+						"signin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Profile Change",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"const dates = pm.collectionVariables.get(\"DaBi\");\r",
+							"const responseBodyProfile = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Check the date of birth\", function () {\r",
+							"    pm.expect(responseBodyProfile.data.dateBirth).to.eql(dates);\r",
+							"});\r",
+							"\r",
+							"pm.collectionVariables.set(\"name\", responseBodyProfile.data.name);\r",
+							"pm.collectionVariables.set(\"last_name\", responseBodyProfile.data.lastName);\r",
+							"pm.collectionVariables.set(\"country\", responseBodyProfile.data.country);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const dabi = pm.collectionVariables.get(\"DaBi\");\r",
+							"console.log(dabi)\r",
+							"pm.variables.set(\"dateOfBirth\", dabi);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Obi-Wan\",\r\n    \"lastName\": \"Kenobi\",\r\n    \"dateBirth\": \"{{dateOfBirth}}\",\r\n    \"country\": \"Stewjon\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_URL}}/users/profile",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"users",
+						"profile"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Profile check",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"const schema = {\r",
+							"  \"type\": \"object\",\r",
+							"  \"properties\": {\r",
+							"    \"status\": {\r",
+							"      \"type\": \"string\"\r",
+							"    },\r",
+							"    \"data\": {\r",
+							"      \"type\": \"object\",\r",
+							"      \"properties\": {\r",
+							"        \"userId\": {\r",
+							"          \"type\": \"integer\"\r",
+							"        },\r",
+							"        \"photoFilename\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"name\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"lastName\": {\r",
+							"          \"type\": \"string\"\r",
+							"        }\r",
+							"      },\r",
+							"      \"required\": [\r",
+							"        \"userId\",\r",
+							"        \"photoFilename\",\r",
+							"        \"name\",\r",
+							"        \"lastName\"\r",
+							"      ]\r",
+							"    }\r",
+							"  },\r",
+							"  \"required\": [\r",
+							"    \"status\",\r",
+							"    \"data\"\r",
+							"  ]\r",
+							"}\r",
+							"\r",
+							"let responseBodyUP = pm.response.json();\r",
+							"pm.test(\"Validating schema\", function(){\r",
+							"    pm.expect(tv4.validate(responseBodyUP, schema)).to.be.true;\r",
+							"});\r",
+							"const nameCheck = pm.collectionVariables.get(\"name\");\r",
+							"const lastnameCheck = pm.collectionVariables.get(\"last_name\");\r",
+							"const dateBirth = pm.collectionVariables.get(\"DaBi\");\r",
+							"const country = pm.collectionVariables.get(\"country\");\r",
+							"const ID = pm.collectionVariables.get(\"UserID\")\r",
+							"\r",
+							"pm.test(`Check if name is equal to ${nameCheck}`,function(){\r",
+							"    pm.expect(responseBodyUP.data.name).to.eql(nameCheck);\r",
+							"});// chekc the name\r",
+							"\r",
+							"pm.test(`Check if last name is equal to ${lastnameCheck}`,function(){\r",
+							"    pm.expect(responseBodyUP.data.lastName).to.eql(lastnameCheck);\r",
+							"});//check the last name\r",
+							"\r",
+							"pm.test(`Check if date is equal to ${dateBirth}`,function(){\r",
+							"    pm.expect(responseBodyUP.data.dateBirth).to.eql(dateBirth);\r",
+							"});//check the date of birth\r",
+							"\r",
+							"pm.test(`Check if country is equal to ${country}`,function(){\r",
+							"    pm.expect(responseBodyUP.data.country).to.eql(country);\r",
+							"}); //check the country\r",
+							"\r",
+							"pm.test(`Check if ID is equal to ${ID}`,function(){\r",
+							"    pm.expect(responseBodyUP.data.userId).to.eql(ID);\r",
+							"}); //check the ID"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.variables.set(\"firstName\", \"Obi-Wan\");\r",
+							"pm.variables.set(\"lastName\", \"Kenobi\");\r",
+							"pm.variables.set(\"dateOfBirth\", \"1957-03-17T15:21:05.000Z\")\r",
+							"pm.variables.set(\"country\", \"Stewjon\")"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_URL}}/users/profile",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"users",
+						"profile"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Password Reset",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"const userIdCol = pm.collectionVariables.get(\"UserID\");\r",
+							"const responseBodyUserId = pm.response.json();\r",
+							"pm.test(`Check if User ID is ${userIdCol}`, function(){\r",
+							"    pm.expect(responseBodyUserId.data.userId).to.eql(userIdCol)\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"oldPassword\": \"{{pass}}\",\r\n  \"password\": \"{{new_pass}}\",\r\n  \"repeatPassword\": \"{{new_pass}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_URL}}/users/password",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"users",
+						"password"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Logout",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"oldPassword\": \"{{pass}}\",\r\n  \"password\": \"{{new_pass}}\",\r\n  \"repeatPassword\": \"{{new_pass}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_URL}}/auth/logout",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"auth",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login Again",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"{{emailgen}}\",\r\n    \"password\": \"{{new_pass}}\",\r\n    \"remember\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_URL}}/auth/signin",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"auth",
+						"signin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Car",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful POST request\", function () {\r",
+							"    pm.expect(pm.response.code).to.be.oneOf([201, 202]);\r",
+							"});\r",
+							"\r",
+							"var bodyData = pm.response.json();\r",
+							"pm.collectionVariables.set(\"carId\", bodyData.data.id);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"mileage\", 200);\r",
+							"pm.variables.set(\"mileage\", pm.collectionVariables.get(\"mileage\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"carBrandId\": 3,\r\n  \"carModelId\": 12,\r\n  \"mileage\": {{mileage}}\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_URL}}/cars",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"cars"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Expenses",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var timestamp = pm.variables.replaceIn('{{$isoTimestamp}}');\r",
+							"var time = timestamp.slice(0, 10);\r",
+							"pm.variables.set(\"time\", time);\r",
+							"pm.variables.set(\"carId\", pm.collectionVariables.get(\"carId\"))\r",
+							"let mileage = pm.collectionVariables.get(\"mileage\");\r",
+							"mileage = ++mileage;\r",
+							"pm.collectionVariables.set(\"mileage\", mileage); //every time the test is started the mileage gets bigger\r",
+							"pm.variables.set(\"mileage\", mileage);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"carId\": {{carId}},\r\n  \"reportedAt\": \"{{time}}\",\r\n  \"mileage\": {{mileage}},\r\n  \"liters\": 12,\r\n  \"totalCost\": 25,\r\n  \"forceMileage\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_URL}}/expenses",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"expenses"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Expenses Repeat",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var timestamp = pm.variables.replaceIn('{{$isoTimestamp}}');\r",
+							"var time = timestamp.slice(0, 10);\r",
+							"pm.variables.set(\"time\", time);\r",
+							"pm.variables.set(\"carId\", pm.collectionVariables.get(\"carId\"))\r",
+							"let mileage = pm.collectionVariables.get(\"mileage\");\r",
+							"mileage = ++mileage;\r",
+							"pm.collectionVariables.set(\"mileage\", mileage); //every time the test is started the mileage gets bigger\r",
+							"pm.variables.set(\"mileage\", mileage);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"carId\": {{carId}},\r\n  \"reportedAt\": \"{{time}}\",\r\n  \"mileage\": {{mileage}},\r\n  \"liters\": 12,\r\n  \"totalCost\": 25,\r\n  \"forceMileage\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_URL}}/expenses",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"expenses"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.collectionVariables.set(\"name\", \"Oleksii\");\r",
+							"pm.collectionVariables.set(\"last_name\", \"Makarov\");\r",
+							"//resetting the variables."
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_URL}}/users",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "DaBi",
+			"value": "1957-03-17T15:21:05.000Z"
+		},
+		{
+			"key": "country",
+			"value": "Stewjon"
+		},
+		{
+			"key": "UserID",
+			"value": ""
+		},
+		{
+			"key": "photoFilename",
+			"value": ""
+		},
+		{
+			"key": "name",
+			"value": "Oleksii",
+			"type": "string"
+		},
+		{
+			"key": "last_name",
+			"value": "Makarov",
+			"type": "string"
+		},
+		{
+			"key": "mileage",
+			"value": ""
+		},
+		{
+			"key": "carId",
+			"value": ""
+		}
+	]
+}
